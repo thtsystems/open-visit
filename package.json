@@ -1,0 +1,13 @@
+{
+  "name": "open-visit",
+  "version": "1.0.0",
+  "description": "Open-source application for visiting scheduling.",
+  "author": "",
+  "license": "MIT",
+  "scripts": {
+    "wrangler": "wrangler"
+  },
+  "dependencies": {
+    "wrangler": "^3.9.0"
+  }
+}
