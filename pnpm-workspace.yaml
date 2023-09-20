@@ -1,0 +1,6 @@
+packages:
+  - web
+  - api
+  - auth
+  - database
+
