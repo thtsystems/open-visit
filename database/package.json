@@ -1,0 +1,22 @@
+{
+  "name": "@open-visit/database",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "types": "index.ts",
+  "type": "module",
+  "scripts": {
+    "db-drop": "pnpm dotenv drizzle-kit drop out=migrations",
+    "db-introspect": "pnpm dotenv drizzle-kit introspect:pg",
+    "db-push": "pnpm dotenv drizzle-kit push:pg",
+    "db-generate": "pnpm dotenv drizzle-kit generate:pg"
+  },
+  "dependencies": {
+    "dotenv-cli": "^7.3.0",
+    "drizzle-orm": "^0.28.6",
+    "pg": "^8.11.3"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.10.3",
+    "drizzle-kit": "^0.19.13"
+  }
+}
