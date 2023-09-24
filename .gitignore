@@ -38,6 +38,7 @@ yarn-error.log*
 tmp/
 temp/
 .docusaurus
+.wrangler
 
 # MAC
 ._*
