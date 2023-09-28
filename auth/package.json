@@ -19,7 +19,7 @@
     }
   },
   "scripts": {
-    "wrangler:dev": "wrangler dev -e dev --port 8010"
+    "dev": "wrangler dev -e dev --port 8010"
   },
   "dependencies": {
     "@lucia-auth/adapter-postgresql": "^2.0.1",
@@ -31,7 +31,6 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20230914.0",
     "@types/pg": "^8.10.3",
-    "prettier": "^3.0.3",
-    "wrangler": "3.9.0"
+    "prettier": "^3.0.3"
   }
 }
