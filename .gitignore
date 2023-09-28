@@ -22,6 +22,7 @@ generated/
 .env.development.local
 .env.test.local
 .env.production.local
+.dev.vars
 
 # LOGS
 logs
@@ -32,12 +33,8 @@ yarn-error.log*
 
 # MISC
 .idea
-.cache/
-.next/
-.nuxt/
 tmp/
 temp/
-.docusaurus
 .wrangler
 
 # MAC

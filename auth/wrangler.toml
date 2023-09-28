@@ -1,0 +1,13 @@
+name = "identity"
+compatibility_date = "2023-09-04"
+node_compat = true
+
+# Worker entrypoint
+main = "index.ts"
+
+[env.dev]
+
+[env.staging]
+
+[env.prod]
+minify = true

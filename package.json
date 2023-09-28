@@ -8,6 +8,6 @@
     "wrangler": "wrangler"
   },
   "dependencies": {
-    "wrangler": "^3.9.0"
+    "wrangler": "^3.10.0"
   }
 }

@@ -1,4 +1,5 @@
 import { pgTable, varchar, bigint } from "drizzle-orm/pg-core";
+
 /**
  * Used to handle authentication.
  *
@@ -21,7 +22,7 @@ export const userKey = pgTable("user_key", {
  * These are created on login, validated on each request, and deleted on signout
  * (or other account sensitive operations)
  *
- * https://lucia-auth.com/basics/sessions
+ * @see: https://lucia-auth.com/basics/sessions
  */
 export const userSession = pgTable("user_session", {
   id: varchar("id").primaryKey().notNull(),
@@ -36,7 +37,7 @@ export const userSession = pgTable("user_session", {
   }).notNull(),
 });
 
-export const users = pgTable("users", {
+export const users = pgTable("user", {
   id: varchar("id").primaryKey().notNull(),
   email: varchar("email").notNull(),
 });
