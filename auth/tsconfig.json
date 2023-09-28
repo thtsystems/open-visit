@@ -1,11 +1,11 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
+    "types": ["@cloudflare/workers-types"] 
     "target": "esnext",
     "module": "NodeNext",
     "moduleResolution": "nodenext",
     "lib": ["esnext"],
-    "types": ["@cloudflare/workers-types"]
   },
   "include": ["app.d.ts", "**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]
