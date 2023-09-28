@@ -1,0 +1,15 @@
+name = "api"
+compatibility_date = "2023-09-04"
+
+# Worker entrypoint
+main = "index.ts"
+
+# Enable polyfills for some Node.js API's
+node_compat = true
+
+[env.dev]
+
+[env.staging]
+
+[env.prod]
+minify = true

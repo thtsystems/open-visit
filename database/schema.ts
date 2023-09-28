@@ -36,7 +36,7 @@ export const userSession = pgTable("user_session", {
   }).notNull(),
 });
 
-export const users = pgTable("users", {
+export const users = pgTable("user", {
   id: varchar("id").primaryKey().notNull(),
   email: varchar("email").notNull(),
 });
