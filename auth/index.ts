@@ -6,7 +6,7 @@ import {
   auth as authFunction,
   hono as honoMiddleware,
   LuciaError,
-} from "./auth.js";
+} from "./auth.ts";
 
 type Bindings = {
   DATABASE_URL: string;
