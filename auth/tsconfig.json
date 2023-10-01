@@ -6,8 +6,8 @@
     "moduleResolution": "nodenext",
     "lib": ["esnext"],
     "types": ["@cloudflare/workers-types"],
-	"allowImportingTSExtensions": true,
-	"noEmit": true
+    "allowImportingTsExtensions": true,
+    "noEmit": true
   },
   "include": ["app.d.ts", "**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]
