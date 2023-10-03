@@ -1,4 +1,4 @@
-import {pgTable, varchar, bigint, uuid, timestamp} from "drizzle-orm/pg-core";
+import {pgTable, varchar, bigint, uuid, timestamp, pgEnum} from "drizzle-orm/pg-core";
 
 /**
  * Used to handle authentication.
@@ -29,10 +29,11 @@ export const userSession = pgTable("user_session", {
   idleExpires: bigint("idle_expires", {mode: "number"}).notNull(),
 });
 
+const userType = pgEnum('user_type', ['EMPLOYEE', 'CONDOMINIUM'])
 export const users = pgTable("user", {
   id: varchar("id").primaryKey().notNull(),
   email: varchar("email").notNull(),
-  user_type: varchar('user_type').notNull(),
+  user_type: userType('user_type').notNull(),
   condominiumId: uuid('condominium_id').notNull().references(() => condominium.id),
   employeeId: uuid('employee_id').notNull().references(() => employee.id)
 });
