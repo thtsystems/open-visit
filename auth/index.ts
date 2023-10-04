@@ -2,11 +2,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { z } from "zod";
 
-import {
-  auth as authFunction,
-  hono as honoMiddleware,
-  LuciaError,
-} from "./auth.ts";
+import { auth as authFunction, hono as honoMiddleware, LuciaError } from "./auth.ts";
 
 type Bindings = {
   DATABASE_URL: string;
@@ -44,7 +40,7 @@ app.use(
     origin: "*",
     allowMethods: ["GET", "POST", "OPTIONS"],
     allowHeaders: ["*"],
-  })
+  }),
 );
 
 /**From here on, we start the service routing logic
@@ -71,8 +67,7 @@ app.post("/login", async (context) => {
       return context.json(session, 200);
     }
   } catch (error) {
-    if (error instanceof LuciaError)
-      return context.json({ error: error.message }, 403);
+    if (error instanceof LuciaError) return context.json({ error: error.message }, 403);
     else {
       console.error(error);
       return context.json({ error: "UNKNOWN_ERROR" }, 500);
@@ -109,8 +104,7 @@ app.post("/create", async (context) => {
 
       return context.json(session, 200);
     } catch (error) {
-      if (error instanceof LuciaError)
-        return context.json({ error: error.message }, 403);
+      if (error instanceof LuciaError) return context.json({ error: error.message }, 403);
       else {
         console.error(error);
         return context.json({ error: "UNKNOWN_ERROR" }, 500);

@@ -3,20 +3,6 @@ import { Client } from "pg";
 
 const client = (connectionString: string) => new Client({ connectionString });
 
-export const database = (connectionString: string) =>
-  drizzle(client(connectionString));
+export const database = (connectionString: string) => drizzle(client(connectionString));
 
-export {
-  eq,
-  ne,
-  gt,
-  gte,
-  lt,
-  lte,
-  ilike,
-  and,
-  or,
-  placeholder,
-  asc,
-  desc,
-} from "drizzle-orm";
+export { eq, ne, gt, gte, lt, lte, ilike, and, or, placeholder, asc, desc } from "drizzle-orm";
