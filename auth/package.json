@@ -28,7 +28,7 @@
     "hono": "^3.6.1",
     "lucia": "2.6.0",
     "pg": "^8.11.3",
-    "zod": "^3.22.2"
+    "zod": "^3.22.3"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20230914.0",
