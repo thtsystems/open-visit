@@ -5,6 +5,8 @@
   "types": "index.ts",
   "type": "module",
   "scripts": {
+    "format": "pnpm prettier . --check --ignore-unknown",
+    "format:write": "pnpm format --writer",
     "db-drop": "pnpm dotenv drizzle-kit drop out=migrations",
     "db-introspect": "pnpm dotenv drizzle-kit introspect:pg",
     "db-push": "pnpm dotenv drizzle-kit push:pg",

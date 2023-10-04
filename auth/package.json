@@ -19,6 +19,8 @@
     }
   },
   "scripts": {
+    "format": "pnpm prettier . --check --ignore-unknown",
+    "format:write": "pnpm format --writer",
     "dev": "wrangler dev -e dev --port 8010"
   },
   "dependencies": {

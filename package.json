@@ -8,6 +8,7 @@
     "wrangler": "wrangler"
   },
   "dependencies": {
+    "prettier": "^3.0.3",
     "wrangler": "^3.10.0"
   }
 }
