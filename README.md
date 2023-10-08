@@ -1,6 +1,24 @@
-[![Figma](https://img.shields.io/badge/figma-%23F24E1E.svg?style=for-the-badge&logo=figma&logoColor=white)](https://www.figma.com/file/b67e4TzDM4AAtjJd2IX0AM/Open-Visit?type=design&node-id=1%3A188&mode=design&t=1wHZ2CJhrXsfeE06-1)
+<style>
+  .badges-container {
+    display: flex;
+    width: 100%;
+    gap: 16px;
+    align-items: center;
+    justify-content: center;
+  }
 
-## Workshop de desenvolvimento de projeto
+</style>
+<h1 align="center">OpenVisit</h1>
+<p align="center">Aplicação open-source para agendamentos de visitas em parques empresariais</p>
+<div align="center" class="badges-container">
+
+[![Specs de design da aplicação no Figma](https://img.shields.io/badge/figma-%23F24E1E.svg?style=for-the-badge&logo=figma&logoColor=white)](https://www.figma.com/file/b67e4TzDM4AAtjJd2IX0AM/Open-Visit?type=design&node-id=1%3A188&mode=design&t=1wHZ2CJhrXsfeE06-1)
+
+[![Documentação da API Rest da aplicação no Postman](https://img.shields.io/badge/postman-%23F24E1E.svg?style=for-the-badge&logo=postman&logoColor=white)](https://god.gw.postman.com/run-collection/18237469-33f92fc9-455e-49f3-8be4-4ec9717abe24?action=collection%2Ffork&source=rip_markdown&collection-url=entityId%3D18237469-33f92fc9-455e-49f3-8be4-4ec9717abe24%26entityType%3Dcollection%26workspaceId%3D60a756b8-3c3a-49f5-b23d-8323980e7f37)
+
+</div>
+
+---
 
 Bem vindos, alunos e demais participantes.
 
