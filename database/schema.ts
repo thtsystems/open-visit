@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { pgTable, varchar, bigint, uuid, timestamp, pgEnum } from "drizzle-orm/pg-core";
+import { pgTable, varchar, bigint, uuid, timestamp, pgEnum, boolean } from "drizzle-orm/pg-core";
 
 /**
  * Used to handle authentication.
@@ -10,7 +10,7 @@ import { pgTable, varchar, bigint, uuid, timestamp, pgEnum } from "drizzle-orm/p
  * @see: https://lucia-auth.com/basics/keys
  */
 export const userKey = pgTable("user_key", {
-  id: varchar("id").primaryKey().notNull(),
+  id: varchar("id").primaryKey().notNull().unique(),
   password: varchar("hashed_password"),
 
   // Referential columns
@@ -30,7 +30,7 @@ export const userType = pgEnum("user_type", ["EMPLOYEE", "CONDOMINIUM"]);
  * @see: https://lucia-auth.com/basics/sessions
  */
 export const userSession = pgTable("user_session", {
-  id: varchar("id").primaryKey().notNull(),
+  id: varchar("id").primaryKey().notNull().unique(),
   activeExpires: bigint("active_expires", { mode: "number" }).notNull(),
   idleExpires: bigint("idle_expires", { mode: "number" }).notNull(),
 
@@ -49,21 +49,19 @@ export const userSession = pgTable("user_session", {
  * of the application based on the application type.
  */
 export const user = pgTable("user", {
-  id: uuid("id").primaryKey().defaultRandom().notNull(),
+  id: uuid("id").primaryKey().defaultRandom().notNull().unique(),
   email: varchar("email").notNull(),
   user_type: userType("user_type").notNull(),
-
-  // Referential columns
-  condominiumId: uuid("condominium_id")
-    .notNull()
-    .references(() => condominium.id),
-  employeeId: uuid("employee_id")
-    .notNull()
-    .references(() => employee.id),
 });
 export const usersRelations = relations(user, ({ one }) => ({
-  condominium: one(condominium),
-  employee: one(employee),
+  condominium: one(condominium, {
+    fields: [user.id],
+    references: [condominium.userId],
+  }),
+  employee: one(employee, {
+    fields: [user.id],
+    references: [employee.userId],
+  }),
 }));
 
 /**
@@ -71,13 +69,20 @@ export const usersRelations = relations(user, ({ one }) => ({
  * can have many companies within).
  */
 export const company = pgTable("company", {
-  id: uuid("id").defaultRandom().primaryKey().notNull(),
+  id: uuid("id").defaultRandom().primaryKey().notNull().unique(),
   name: varchar("name").notNull(),
   cnpj: varchar("cnpj", { length: 14 }).notNull(),
   cpf: varchar("cpf", { length: 11 }).notNull(),
   condominiumAddress: varchar("condominium_address"),
+  active: boolean("active").notNull().default(true),
+
+  condominiumId: uuid("condominium_id").references(() => condominium.id),
 });
-export const companyRelationships = relations(company, ({ many }) => ({
+export const companyRelationships = relations(company, ({ one, many }) => ({
+  condominium: one(condominium, {
+    fields: [company.condominiumId],
+    references: [condominium.id],
+  }),
   employees: many(employee),
   departments: many(department),
   schedulings: many(scheduling),
@@ -88,16 +93,19 @@ export const companyRelationships = relations(company, ({ many }) => ({
  * used when the `user.user_type = "CONDOMINIUM"`.
  */
 export const condominium = pgTable("condominium", {
-  id: uuid("id").defaultRandom().primaryKey().notNull(),
+  id: uuid("id").defaultRandom().primaryKey().notNull().unique(),
   name: varchar("name").notNull(),
-  cnpj: varchar("cnpj", { length: 14 }).notNull(),
+  cnpj: varchar("cnpj", { length: 14 }).notNull().unique(),
   address: varchar("address").notNull(),
   city: varchar("city").notNull(),
   uf: varchar("uf", { length: 2 }).notNull(),
   cep: varchar("cep", { length: 8 }).notNull(),
+
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => user.id),
 });
 export const condominiumRelationships = relations(condominium, ({ many, one }) => ({
-  user: one(user),
   companies: many(company),
   schedulings: many(scheduling),
 }));
@@ -113,6 +121,9 @@ export const employee = pgTable("employee", {
   phoneNumber: varchar("phone_number", { length: 14 }).notNull(),
 
   // Referential columns
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => company.id),
   companyId: uuid("company_id")
     .notNull()
     .references(() => company.id),
@@ -121,9 +132,14 @@ export const employee = pgTable("employee", {
     .references(() => department.id),
 });
 export const employeeRelationships = relations(employee, ({ one }) => ({
-  user: one(user),
-  company: one(company),
-  department: one(department),
+  company: one(company, {
+    fields: [employee.companyId],
+    references: [company.id],
+  }),
+  department: one(department, {
+    fields: [employee.departmentId],
+    references: [department.id],
+  }),
 }));
 
 /** The department is an organizational unit within one company.
@@ -141,8 +157,11 @@ export const department = pgTable("department", {
     .references(() => company.id),
 });
 export const departmentRelationships = relations(department, ({ one, many }) => ({
-  company: one(company),
-  employee: many(company),
+  company: one(company, {
+    fields: [department.companyId],
+    references: [company.id],
+  }),
+  employee: many(employee),
 }));
 
 /**
@@ -167,6 +186,12 @@ export const scheduling = pgTable("scheduling", {
     .references(() => company.id),
 });
 export const schedulingRelationshipts = relations(scheduling, ({ one }) => ({
-  company: one(company),
-  condominium: one(condominium),
+  condominium: one(condominium, {
+    fields: [scheduling.condominiumId],
+    references: [condominium.id],
+  }),
+  company: one(company, {
+    fields: [scheduling.companyId],
+    references: [company.id],
+  }),
 }));
