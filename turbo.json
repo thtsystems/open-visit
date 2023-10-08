@@ -1,0 +1,58 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "pipeline": {
+    "topo": {
+      "dependsOn": ["^topo"]
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "//#format": {
+      "outputs": ["node_modules/.cache/prettiercache"],
+      "outputMode": "errors-only"
+    },
+    "format": {
+      "dependsOn": ["@repo/db#db:generate", "^topo"],
+      "outputs": ["node_modules/.cache/prettiercache"],
+      "outputMode": "errors-only"
+    },
+    "//#format:fix": {
+      "outputs": ["node_modules/.cache/prettiercache"],
+      "outputMode": "errors-only"
+    },
+    "format:fix": {
+      "dependsOn": ["@repo/db#db:generate", "^topo"],
+      "outputs": ["node_modules/.cache/prettiercache"],
+      "outputMode": "errors-only"
+    },
+    "//#lint": {
+      "outputs": ["node_modules/.cache/.eslintcache"],
+      "outputMode": "errors-only"
+    },
+    "lint": {
+      "dependsOn": ["@repo/db#db:generate", "^topo"],
+      "outputs": ["node_modules/.cache/.eslintcache"],
+      "outputMode": "errors-only"
+    },
+    "//#lint:fix": {
+      "dependsOn": ["@repo/db#db:generate", "^topo"],
+      "outputs": ["node_modules/.cache/.eslintcache"],
+      "outputMode": "errors-only"
+    },
+    "lint:fix": {
+      "dependsOn": ["@repo/db#db:generate", "^topo"],
+      "outputs": ["node_modules/.cache/.eslintcache"],
+      "outputMode": "errors-only"
+    },
+    "typecheck": {
+      "dependsOn": ["@repo/db#db:generate", "^topo"],
+      "outputs": ["node_modules/.cache/tsbuildinfo.json"],
+      "outputMode": "errors-only"
+    }
+  }
+}

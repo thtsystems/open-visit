@@ -46,7 +46,7 @@ Some modules are shared with each other trough the [Workspace](https://pnpm.io/w
 
 To install the dependencies, run `pnpm install` on the root directory. This will install the dependencies for all workspaces.
 
-### Running the database container with Docker
+#### Running the database container with Docker
 
 First, make sure Docker is installed, and that the daemon service is running. You can check if the daemon is running by running `docker info` on the command line.
 
@@ -70,6 +70,22 @@ PGADMIN_DEFAULT_PASSWORD=admin
 ```
 
 Which means that, to access the database, you'll use the connection string `postgres://postgres:postgres@localhost:5432`, and to access the pgAdmin panel, you'll go to `http://localhost:5050` in the browser and use `pgadmin4@pgadmin.org` as the email and `admin` as the password during authentication.
+
+#### Setting up the database
+
+Before running the application, you should setup the database schema.
+
+1. Run `docker compose up -d` from the root of the project to initialize the database container.
+2. Run `pnpm env:create` to create local `.env` files with the default values on all workspaces.
+3. List the docker containers with `docker ps`, look for the container id of the Postgres database container, and open it's terminal instance with `docker exec -it <container_id> bash`.
+4. Run `psql -U postgres` to open the Postgres CLI.
+5. On the `psql` console, create the database with `CREATE DATABASE openvisit;`. You can check if the database was created sucessfully with by going into it with `\c openvisit`.
+6. On another terminal instance, in the root directory of the project, run `pnpm db:push` to push the schema definitions to the database.
+7. Back on the `psql` terminal instance, you can check that the tables were created with `\d`, and `\d <table_name>` to check the columns of a specific table.
+
+#### Running the services
+
+With the database properly setup, all you need to do now is run the services. From the root of the project, you can run `pnpm dev`, and all the services will run concurrently using [Turbo](https://turbo.build/repo). Alternatively, you can run each service individually in seperate terminal instances by running `cd <workspace_directory>` and `pnpm dev` on each one.
 
 ### Pull Request
 
