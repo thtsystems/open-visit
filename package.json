@@ -5,10 +5,16 @@
   "author": "",
   "license": "MIT",
   "scripts": {
-    "wrangler": "wrangler"
+    "wrangler": "wrangler",
+    "dev": "turbo dev --no-cache --continue --parallel --concurrency=1000",
+    "db:push": "turbo db:push",
+    "db:generate": "turbo db:generate",
+    "db:studio": "turbo db:studio"
   },
   "dependencies": {
     "prettier": "^3.0.3",
-    "wrangler": "^3.10.0"
+    "turbo": "^1.10.15",
+    "typescript": "^5.2.2",
+    "wrangler": "^3.11.0"
   }
 }
