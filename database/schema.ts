@@ -51,7 +51,7 @@ export const userSession = pgTable("user_session", {
 export const user = pgTable("user", {
   id: uuid("id").primaryKey().defaultRandom().notNull().unique(),
   email: varchar("email").notNull(),
-  user_type: userType("user_type").notNull(),
+  userType: userType("user_type").notNull(),
 });
 export const usersRelations = relations(user, ({ one }) => ({
   condominium: one(condominium, {
