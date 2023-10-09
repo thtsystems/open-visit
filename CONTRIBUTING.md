@@ -75,7 +75,7 @@ Which means that, to access the database, you'll use the connection string `post
 Before running the application, you should setup the database schema.
 
 1. Run `docker compose up -d` from the root of the project to initialize the database container.
-2. Run `pnpm env:create` to create local `.env` files with the default values on all workspaces.
+2. Copy the `.env.example` file which holds the environment variables for the database: `cp database/.env.example database/.env`.
 3. List the docker containers with `docker ps`, look for the container id of the Postgres database container, and open it's terminal instance with `docker exec -it <container_id> bash`.
 4. Run `psql -U postgres` to open the Postgres CLI.
 5. On the `psql` console, create the database with `CREATE DATABASE openvisit;`. You can check if the database was created sucessfully with by going into it with `\c openvisit`.
