@@ -38,7 +38,7 @@ O projeto irá adotar as seguintes tecnologias:
 
 - **[React](https://react.dev/)**: aplicação cliente na web;
 - **[Hono](https://hono.dev/)**: aplicação backend (API);
-- **[SQLite (D1)](https://developers.cloudflare.com/d1/)**: base de dados;
+- **[Postgres](https://www.postgresql.org/)**: base de dados;
 - **[Cloudflare](https://developers.cloudflare.com/):** provedor de serviços de cloud;
 
 ### Acompanhando os espaços
