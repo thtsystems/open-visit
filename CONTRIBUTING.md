@@ -41,9 +41,9 @@ This is the project's directory structure:
  ├ 📂 web ## Web client application in React.
 ```
 
-Some modules are shared with each other trough the [Workspace](https://pnpm.io/workspaces) feature from the `pnpm` package manager. For example, the `@open-visit/api` module imports the `@open-visit/database` module to connect to the database, and the `@open-visit/auth` as the authentication helper.
+Some modules are shared with each other trough the [Workspace](https://pnpm.io/workspaces) feature from the `pnpm` package manager. For example, the `@open-visit/api` module imports the `@open-visit/database` module to connect to the database.
 
-To install the dependencies, run `pnpm install` on the root directory. This will install the dependencies for all workspaces.
+To install the dependencies, run `pnpm install` on the root directory. This will install the dependencies for all workspaces, including the ones under child directories.
 
 #### Running the database container with Docker
 
@@ -56,7 +56,7 @@ Once the container setup is finished those resources will be available:
 - The database instance, running locally on `postgres://localhost:5432`
 - A web based instance og [pgAdmin](https://www.pgadmin.org/) that can be used to visualize and interact visually with the database, running locally on `http://localhost:5050`
 
-You can customize how you access both resources by creating an .env file on the root directory. Unless explicitly specified, the default values will be used.
+You can customize how you access both resources by creating new values on an `.env` file on the root directory. Unless explicitly specified, the default values will be used.
 
 These are the default values:
 
