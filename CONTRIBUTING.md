@@ -36,8 +36,7 @@ This is the project's directory structure:
 
 ```bash
 📦 <project root>
- ├ 📂 api ## Source code for API service running on Cloudflare Workers, written with Hono.
- ├ 📂 auth ## Configuration for the authentication module using Lucia.
+ ├ 📂 api ## Source code for API service running on Cloudflare Workers, written with Hono & Lucia.
  ├ 📂 database ## Configuration for the database connection and schema modeling using Drizzle.
  ├ 📂 web ## Web client application in React.
 ```
