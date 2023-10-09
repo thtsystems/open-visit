@@ -1,0 +1,26 @@
+{
+  "name": "@open-visit/api",
+  "version": "1.0.0",
+  "license": "MIT",
+  "type": "module",
+  "main": "index.ts",
+  "scripts": {
+    "format": "pnpm prettier . --check --ignore-unknown",
+    "format:write": "pnpm format --writer",
+    "dev": "wrangler dev -e dev --port 8000"
+  },
+  "dependencies": {
+    "@lucia-auth/adapter-postgresql": "^2.0.1",
+    "@open-visit/database": "workspace:^",
+    "drizzle-zod": "^0.5.1",
+    "hono": "^3.7.5",
+    "lucia": "2.7.1",
+    "pg": "^8.11.3",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20231002.0",
+    "@types/pg": "^8.10.3",
+    "prettier": "^3.0.3"
+  }
+}

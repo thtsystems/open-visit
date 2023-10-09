@@ -27,6 +27,7 @@ export function auth<T>(connectionString: string, middleware: Middleware<[T]>) {
       return {
         id: userData.id,
         email: userData.email,
+        user_type: userData.user_type,
       };
     },
     csrfProtection: false,
