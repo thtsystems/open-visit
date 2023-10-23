@@ -79,17 +79,7 @@ Which means that, to access the database, you'll use the connection string `post
 Before running the application, you should setup the database schema.
 
 1. Run `docker compose up -d` from the root of the project to initialize the database container.
-<<<<<<< HEAD
-2. Copy the `.env.example` file which holds the environment variables for the database: `cp database/.env.example database/.env`.
-3. List the docker containers with `docker ps`, look for the container id of the Postgres database container, and open it's terminal instance with `docker exec -it <container_id> bash`.
-4. Run `psql -U postgres` to open the Postgres CLI.
-5. On the `psql` console, create the database with `CREATE DATABASE openvisit;`. You can check if the database was created sucessfully with by going into it with `\c openvisit`.
-6. On another terminal instance, in the root directory of the project, run `pnpm db:push` to push the schema definitions to the database.
-7. Back on the `psql` terminal instance, you can check that the tables were created with `\d`, and `\d <table_name>` to check the columns of a specific table.
-=======
 2. On another terminal instance, in the root directory of the project, run `pnpm db:push` to push the schema definitions to the database.
->>>>>>> 6819c52 (docs: update `CONTRIBUTING.md` instructions)
-
 #### Running the services
 
 With the database properly setup, all you need to do now is run the services. From the root of the project, you can run `pnpm dev`, and all the services will run concurrently using [Turbo](https://turbo.build/repo). Alternatively, you can run each service individually in seperate terminal instances by running `cd <workspace_directory>` and `pnpm dev` on each one.
