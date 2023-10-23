@@ -13,14 +13,14 @@
     "@lucia-auth/adapter-postgresql": "^2.0.1",
     "@open-visit/database": "workspace:^",
     "drizzle-zod": "^0.5.1",
-    "hono": "^3.7.5",
+    "hono": "^3.8.2",
     "lucia": "2.7.1",
     "pg": "^8.11.3",
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20231002.0",
-    "@types/pg": "^8.10.3",
+    "@cloudflare/workers-types": "^4.20231016.0",
+    "@types/pg": "^8.10.7",
     "prettier": "^3.0.3"
   }
 }

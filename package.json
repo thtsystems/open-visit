@@ -13,8 +13,8 @@
   },
   "dependencies": {
     "prettier": "^3.0.3",
-    "turbo": "^1.10.15",
+    "turbo": "^1.10.16",
     "typescript": "^5.2.2",
-    "wrangler": "^3.11.0"
+    "wrangler": "^3.14.0"
   }
 }
