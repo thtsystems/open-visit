@@ -69,6 +69,7 @@ condominium.get("/:id", async (context) => {
 
     return context.json(condominium, 200);
   } catch (error) {
+    console.error(error);
     return context.text("Internal server error", 500);
   }
 });
@@ -132,6 +133,7 @@ condominium.post(
         if (error.code === "23505")
           return context.json({ errorMessage: "Condominium already exists" }, 400);
       } else {
+        console.error(error);
         return context.text("Internal server error", 500);
       }
     }
