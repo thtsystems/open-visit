@@ -1,14 +1,15 @@
-import { Hono } from "hono";
-import { validator } from "hono/validator";
-import { z, ZodError } from "zod";
-import { createInsertSchema } from "drizzle-zod";
+import {Hono} from "hono";
+import {validator} from "hono/validator";
+import {z, ZodError} from "zod";
+import {createInsertSchema} from "drizzle-zod";
 
-import { Client, DatabaseError } from "pg";
-import { database } from "@open-visit/database";
-import { user as userTable } from "@open-visit/database/schema";
-import { employee as employeeTable } from "@open-visit/database/schema";
+import {Client, DatabaseError} from "pg";
+import {database, eq} from "@open-visit/database";
+import {employee as employeeTable, user as userTable} from "@open-visit/database/schema";
 
-import { auth as authFunction, hono as honoMiddleware } from "../auth";
+import {auth as authFunction, hono as honoMiddleware} from "../auth";
+
+const validate = require("uuid-validate")
 
 type Bindings = {
   DATABASE_URL: string;
@@ -31,8 +32,7 @@ export const employee = new Hono<{ Bindings: Bindings }>();
  * We pass the database connection string and the middleware as parameters. */
 async function buildAuthClient(env: Bindings) {
   const connectionString = env.DATABASE_URL;
-  const auth = authFunction(connectionString, honoMiddleware());
-  return auth;
+  return authFunction(connectionString, honoMiddleware());
 }
 
 employee.post(
@@ -96,3 +96,108 @@ employee.post(
     }
   },
 );
+
+employee.get("/:employee_id",
+    validator('param', (value, context) => {
+        const { employee_id } = value
+
+        if(!validate(employee_id))
+            return context.text("you need to use a UUID as param", 400)
+
+        return {
+            employee_id
+        }
+    }),
+    async context => {
+        try {
+            const { employee_id } = context.req.valid("param")
+
+            const client = new Client({connectionString: context.env.DATABASE_URL})
+            await client.connect()
+
+            const employee = await database(client).query.employee.findFirst({
+                where: (employee, {eq}) => eq(employee.id, employee_id)
+            })
+            await client.end()
+
+            if (typeof employee === "undefined")
+                return context.json({ message: "Employee not found" }, 404);
+
+            return context.json(employee, 200)
+        } catch (error) {
+            console.error(error);
+            return context.text("Internal server error", 500);
+        }
+    }
+)
+
+employee.put("/:employee_id",
+    validator("param", (value, context) => {
+        const { employee_id } = value
+
+        if(!validate(employee_id))
+            return context.text("you need to use a UUID as param", 400)
+
+        return {
+            employee_id
+        }
+    }),
+    validator("json", (value, context) => {
+        try{
+            return employeeSchema
+                .omit({
+                    userId: true,
+                    departmentId: true,
+                    companyId: true,
+                    id: true
+                })
+                .parse(value);
+        }catch (error){
+            if (error instanceof ZodError) {
+                return context.json(
+                    {
+                        errorMessage: "Bad payload",
+                        error: error.issues,
+                    },
+                    400,
+                );
+            }
+            return context.text("Internal server error", 500);
+        }
+    }),
+    async context => {
+        try{
+            const { employee_id } = context.req.valid("param")
+            const { email, name, phoneNumber } = context.req.valid("json")
+
+            const client = new Client({connectionString: context.env.DATABASE_URL})
+            await client.connect()
+
+            const employee = await database(client)
+                .update(employeeTable)
+                .set({
+                    email: email,
+                    name: name,
+                    phoneNumber: phoneNumber
+
+                })
+                .where(eq(employeeTable.id, employee_id))
+                .returning({
+                    updatedId: employeeTable.id,
+                    name: employeeTable.name,
+                    email: employeeTable.email,
+                    phoneNumber: employeeTable.phoneNumber
+                })
+
+            if(Object.keys(employee).length === 0)
+                return context.json({ message: "Employee not found" }, 404);
+
+            await client.end()
+
+            return context.json(employee, 200)
+        }catch (error) {
+            console.error(error);
+            return context.text("Internal server error", 500);
+        }
+    }
+)
