@@ -1,17 +1,19 @@
 import {Hono} from "hono"
 import {validator} from "hono/validator";
 
-import {company} from "@open-visit/database/schema";
+import {company as companyTable} from "@open-visit/database/schema";
 
 import {auth as authFunction, hono as honoMiddleware} from "../auth";
 import {createInsertSchema} from "drizzle-zod";
 import {z, ZodError} from "zod";
+import {Client, DatabaseError} from "pg";
+import {database} from "@open-visit/database";
 
 type Bindings = {
     DATABASE_URL: string
 };
 
-const companySchema = createInsertSchema(company, {
+const companySchema = createInsertSchema(companyTable, {
     id: z.string().uuid(),
     condominiumId: z.string().uuid(),
     cnpj: z.string().length(14),
@@ -51,6 +53,32 @@ companies.post("/",
         }
     }),
     async context => {
-        // TODO - Insert into company schema
+        try{
+            const companyPayload = context.req.valid("json")
+            const client = new Client({ connectionString: context.env.DATABASE_URL })
+
+            await client.connect();
+
+            await database(client).insert(companyTable).values({
+                name: companyPayload.name,
+                cpf: companyPayload.cpf,
+                cnpj: companyPayload.cnpj,
+                active: companyPayload.active,
+                condominiumId: companyPayload.condominiumId,
+                condominiumAddress: companyPayload.condominiumAddress
+            })
+
+            await client.end()
+
+            return context.json({message: "Company created successfully"}, 200)
+        }catch (error){
+            if (error instanceof DatabaseError)
+                if (error.code === "23505")
+                    return context.json({ errorMessage: "Condominium already exists"}, 400)
+                else{
+                    console.error(error)
+                    return context.text("Internal server error", 500);
+                }
+        }
     }
 )
