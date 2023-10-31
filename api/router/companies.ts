@@ -9,6 +9,8 @@ import {z, ZodError} from "zod";
 import {Client, DatabaseError} from "pg";
 import {database} from "@open-visit/database";
 
+const validate = require("uuid-validate")
+
 type Bindings = {
     DATABASE_URL: string
 };
@@ -31,6 +33,9 @@ async function buildAuthClient(env: Bindings) {
     return authFunction(connectionString, honoMiddleware());
 }
 
+/* POST - /company
+* Creates a new company
+*/
 companies.post("/",
     validator("json", (value, context) => {
         try {
@@ -53,9 +58,9 @@ companies.post("/",
         }
     }),
     async context => {
-        try{
+        try {
             const companyPayload = context.req.valid("json")
-            const client = new Client({ connectionString: context.env.DATABASE_URL })
+            const client = new Client({connectionString: context.env.DATABASE_URL})
 
             await client.connect();
 
@@ -71,14 +76,128 @@ companies.post("/",
             await client.end()
 
             return context.json({message: "Company created successfully"}, 200)
-        }catch (error){
+        } catch (error) {
             if (error instanceof DatabaseError)
                 if (error.code === "23505")
-                    return context.json({ errorMessage: "Condominium already exists"}, 400)
-                else{
+                    return context.json({errorMessage: "Condominium already exists"}, 400)
+                else {
                     console.error(error)
                     return context.text("Internal server error", 500);
                 }
+        }
+    }
+)
+
+/* GET - /:company_id
+* returns the information about company
+*/
+companies.get("/:company_id",
+    validator("param", (value, context) => {
+        const {company_id} = value
+        //
+        // if (!validate(company_id))
+        //     return context.text("you need to use a UUID as param", 400)
+
+        return {
+            company_id
+        }
+    }),
+    async context => {
+        try {
+            const {company_id} = context.req.valid("param")
+
+            const client = new Client({connectionString: context.env.DATABASE_URL})
+            await client.connect()
+
+            const company = database(client).query.company.findFirst({
+                where: (company, {eq}) => eq(company.id, company_id)
+            })
+
+            await client.end()
+
+            if (typeof company === "undefined")
+                return context.json({message: "Company not found"}, 404)
+
+            return context.json(company, 200)
+        } catch (error) {
+            console.log(error)
+            return context.text("Internal server error", 500)
+        }
+    }
+)
+
+/* GET - /:company_id/employees
+* Returns all the employees of a company
+*/
+companies.get("/:company_id/employees",
+    validator("param", (value, context) => {
+        const {company_id} = value
+
+        if (!validate(company_id))
+            return context.text("you need to use a UUID as param", 400)
+
+        return {
+            company_id
+        }
+    }),
+    async context => {
+        try {
+            const {company_id} = context.req.valid("param")
+
+            const client = new Client({connectionString: context.env.DATABASE_URL})
+            await client.connect()
+
+            const employees = database(client).query.employee.findMany({
+                where: (employee, {eq}) => eq(employee.companyId, company_id)
+            })
+
+            await client.end()
+
+            if (typeof employees === "undefined")
+                return context.json({message: "Company does not has employees"}, 404)
+
+            return context.json(employees, 200)
+        } catch (error) {
+            console.log(error)
+            return context.text("Internal server error", 500)
+        }
+    }
+)
+
+/* GET - /:company_id/schedulings
+* Returns all company schedules
+*/
+companies.get("/:company_id/schedulings",
+    validator("param", (value, context) => {
+        const {company_id} = value
+
+        if (!validate(company_id))
+            return context.text("you need to use a UUID as param", 400)
+
+        return {
+            company_id
+        }
+    }),
+    async context => {
+        try {
+            const {company_id} = context.req.valid("param")
+
+            const client = new Client({connectionString: context.env.DATABASE_URL})
+            await client.connect()
+
+            const schedules = database(client).query.scheduling.findMany({
+                where: (schedule, {eq}) => eq(schedule.companyId, company_id)
+            })
+
+            await client.end()
+
+            if (typeof schedules === "undefined")
+                return context.json({message: "Company does not has employees"}, 404)
+
+            return context.json(schedules, 200)
+        } catch (error) {
+            console.log(error)
+            return context.text("Internal server error", 500)
         }
     }
 )
