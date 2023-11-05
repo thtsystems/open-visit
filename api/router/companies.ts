@@ -7,7 +7,8 @@ import {auth as authFunction, hono as honoMiddleware} from "../auth";
 import {createInsertSchema} from "drizzle-zod";
 import {z, ZodError} from "zod";
 import {Client, DatabaseError} from "pg";
-import {database} from "@open-visit/database";
+import {database, eq} from "@open-visit/database";
+import {type} from "os";
 
 const validate = require("uuid-validate")
 
@@ -196,6 +197,73 @@ companies.get("/:company_id/schedulings",
 
             return context.json(schedules, 200)
         } catch (error) {
+            console.log(error)
+            return context.text("Internal server error", 500)
+        }
+    }
+)
+
+/* PUT - /:company_id
+ * Update a company
+ */
+companies.put("/:company_id",
+    validator("param", (value, context) => {
+        const {company_id} = value
+
+        if (!validate(company_id))
+            return context.text("you need to use a UUID as param", 400)
+
+        return {
+            company_id
+        }
+    }),
+    validator("json", (value, context) => {
+        try {
+            return companySchema
+                .omit({
+                    id: true,
+                    condominiumId: true
+                })
+                .parse(value)
+        } catch (error) {
+            if (error instanceof ZodError)
+                return context.json(
+                    {
+                        errorMessage: "Bad payload",
+                        error: error.issues,
+                    },
+                    400,
+                )
+
+            return context.text("Internal server error", 500);
+        }
+    }),
+    async context => {
+        try{
+            const { company_id } = context.req.valid("param")
+            const { name, cpf, cnpj, active, condominiumAddress } = context.req.valid("json")
+
+            const client  = new Client({connectionString: context.env.DATABASE_URL})
+            await client.connect()
+
+            const updatedId: {updatedId: string}[] = await database(client).update(companyTable)
+                .set({
+                    name: name,
+                    cpf: cpf,
+                    cnpj: cnpj,
+                    active: active,
+                    condominiumAddress: condominiumAddress
+                })
+                .where(eq(companyTable.id, company_id))
+                .returning({ updatedId: companyTable.id })
+
+            await client.end()
+
+            if(typeof updatedId === "undefined")
+                return context.text("Not updated: company not found", 404)
+
+            return context.json( updatedId[0], 200)
+        }catch(error){
             console.log(error)
             return context.text("Internal server error", 500)
         }
