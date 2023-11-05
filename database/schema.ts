@@ -76,7 +76,7 @@ export const company = pgTable("company", {
   condominiumAddress: varchar("condominium_address"),
   active: boolean("active").notNull().default(true),
 
-  condominiumId: uuid("condominium_id").references(() => condominium.id),
+  condominiumId: uuid("condominium_id").notNull().references(() => condominium.id),
 });
 export const companyRelationships = relations(company, ({ one, many }) => ({
   condominium: one(condominium, {
