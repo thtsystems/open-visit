@@ -94,9 +94,9 @@ companies.post("/",
 companies.get("/:company_id",
     validator("param", (value, context) => {
         const {company_id} = value
-        //
-        // if (!validate(company_id))
-        //     return context.text("you need to use a UUID as param", 400)
+
+        if (!validate(company_id))
+            return context.text("you need to use a UUID as param", 400)
 
         return {
             company_id
@@ -109,7 +109,7 @@ companies.get("/:company_id",
             const client = new Client({connectionString: context.env.DATABASE_URL})
             await client.connect()
 
-            const company = database(client).query.company.findFirst({
+            const company = await database(client).query.company.findFirst({
                 where: (company, {eq}) => eq(company.id, company_id)
             })
 
@@ -147,7 +147,7 @@ companies.get("/:company_id/employees",
             const client = new Client({connectionString: context.env.DATABASE_URL})
             await client.connect()
 
-            const employees = database(client).query.employee.findMany({
+            const employees = await database(client).query.employee.findMany({
                 where: (employee, {eq}) => eq(employee.companyId, company_id)
             })
 
@@ -185,7 +185,7 @@ companies.get("/:company_id/schedulings",
             const client = new Client({connectionString: context.env.DATABASE_URL})
             await client.connect()
 
-            const schedules = database(client).query.scheduling.findMany({
+            const schedules = await database(client).query.scheduling.findMany({
                 where: (schedule, {eq}) => eq(schedule.companyId, company_id)
             })
 
