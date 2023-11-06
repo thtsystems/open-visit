@@ -222,7 +222,6 @@ companies.put("/:company_id",
                 .omit({
                     id: true,
                     condominiumId: true,
-                    active: true
                 })
                 .parse(value)
         } catch (error) {
@@ -241,7 +240,7 @@ companies.put("/:company_id",
     async context => {
         try{
             const { company_id } = context.req.valid("param")
-            const { name, cpf, cnpj, condominiumAddress } = context.req.valid("json")
+            const { name, cpf, cnpj, active, condominiumAddress } = context.req.valid("json")
 
             const client  = new Client({connectionString: context.env.DATABASE_URL})
             await client.connect()
@@ -251,6 +250,7 @@ companies.put("/:company_id",
                     name: name,
                     cpf: cpf,
                     cnpj: cnpj,
+                    active: active,
                     condominiumAddress: condominiumAddress
                 })
                 .where(eq(companyTable.id, company_id))
