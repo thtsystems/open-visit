@@ -8,7 +8,6 @@ import {createInsertSchema} from "drizzle-zod";
 import {z, ZodError} from "zod";
 import {Client, DatabaseError} from "pg";
 import {database, eq} from "@open-visit/database";
-import {type} from "os";
 
 const validate = require("uuid-validate")
 
@@ -111,7 +110,7 @@ companies.get("/:company_id",
             await client.connect()
 
             const company = await database(client).query.company.findFirst({
-                where: (company, {eq}) => eq(company.id, company_id)
+                where: (company, {and, eq}) => and(eq(company.id, company_id), eq(company.active, true))
             })
 
             await client.end()
@@ -187,7 +186,7 @@ companies.get("/:company_id/schedulings",
             await client.connect()
 
             const schedules = await database(client).query.scheduling.findMany({
-                where: (schedule, {eq}) => eq(schedule.companyId, company_id)
+                where: (schedule, {eq, and}) => eq(schedule.companyId, company_id)
             })
 
             await client.end()
@@ -222,7 +221,8 @@ companies.put("/:company_id",
             return companySchema
                 .omit({
                     id: true,
-                    condominiumId: true
+                    condominiumId: true,
+                    active: true
                 })
                 .parse(value)
         } catch (error) {
@@ -241,7 +241,7 @@ companies.put("/:company_id",
     async context => {
         try{
             const { company_id } = context.req.valid("param")
-            const { name, cpf, cnpj, active, condominiumAddress } = context.req.valid("json")
+            const { name, cpf, cnpj, condominiumAddress } = context.req.valid("json")
 
             const client  = new Client({connectionString: context.env.DATABASE_URL})
             await client.connect()
@@ -251,10 +251,10 @@ companies.put("/:company_id",
                     name: name,
                     cpf: cpf,
                     cnpj: cnpj,
-                    active: active,
                     condominiumAddress: condominiumAddress
                 })
                 .where(eq(companyTable.id, company_id))
+                //.where(and(eq(companyTable.id, company_id), eq(companyTable.active, true))) in case if want to filter only actives to update
                 .returning({ updatedId: companyTable.id })
 
             await client.end()
@@ -264,6 +264,47 @@ companies.put("/:company_id",
 
             return context.json( updatedId[0], 200)
         }catch(error){
+            console.log(error)
+            return context.text("Internal server error", 500)
+        }
+    }
+)
+
+/* DELETE - /:company_id
+ * remove a company
+ */
+companies.delete("/:company_id",
+    validator("param", (value, context) => {
+        const {company_id} = value
+
+        if (!validate(company_id))
+            return context.text("you need to use a UUID as param", 400)
+
+        return {
+            company_id
+        }
+    }),
+    async context => {
+        try{
+            const { company_id } = context.req.valid("param")
+
+            const client = new Client(context.env.DATABASE_URL)
+            await client.connect()
+
+            const removedId: {removedId: string}[] = await database(client).update(companyTable)
+                .set({
+                    active: false
+                })
+                .where(eq(companyTable.id, company_id))
+                .returning({removedId: companyTable.id})
+
+            await client.end()
+
+            if(typeof removedId === "undefined")
+                return context.text("Company not removed: not found", 404)
+
+            return context.json(removedId[0], 200)
+        } catch (error){
             console.log(error)
             return context.text("Internal server error", 500)
         }
