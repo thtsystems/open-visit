@@ -10,7 +10,8 @@
     "db:push": "pnpm dotenv drizzle-kit push:pg",
     "dev": "pnpm dotenv drizzle-kit studio",
     "format": "pnpm prettier . --check --ignore-unknown",
-    "format:write": "pnpm format --writer"
+    "format:write": "pnpm format --writer",
+    "db:seed": "node ./seed.ts"
   },
   "dependencies": {
     "dotenv-cli": "^7.3.0",
