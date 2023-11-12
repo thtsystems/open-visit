@@ -6,19 +6,14 @@ import {fakerPT_BR as faker} from "@faker-js/faker";
 if (!("DATABASE_URL" in process.env))
     throw new Error("DATABASE_URL not found in .env")
 
-async function main() {
-    const client = new Client({connectionString: process.env.DATABASE_URL})
-    await client.connect()
-
-    const db = database(client)
-
+function createData(){
     const condominiumData: (typeof condominium.$inferInsert)[] = []
     const companyData: (typeof company.$inferInsert)[] = []
     const departmentData: (typeof department.$inferInsert)[] = []
     const employeeData: (typeof employee.$inferInsert)[] = []
     const schedulingData: (typeof scheduling.$inferInsert)[] = []
 
-    // TODO - create a better data structure and seeds for each company
+    // TODO - create a better data structure and seeds for each condominium
     for (let i = 0; i < 20; i++) {
         const condominiumId = faker.string.uuid()
         condominiumData.push({
@@ -76,6 +71,23 @@ async function main() {
             subject: "Talk about " + faker.science.chemicalElement()
         })
     }
+
+    return {
+        condominiumData,
+        companyData,
+        departmentData,
+        employeeData,
+        schedulingData
+    }
+}
+
+async function main() {
+    const client = new Client({connectionString: process.env.DATABASE_URL})
+    await client.connect()
+
+    const db = database(client)
+
+    const {condominiumData, companyData, departmentData, employeeData, schedulingData} = createData()
 
     console.log("Start seeding")
 
