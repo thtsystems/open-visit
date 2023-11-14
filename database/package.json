@@ -11,7 +11,7 @@
     "dev": "pnpm dotenv drizzle-kit studio",
     "format": "pnpm prettier . --check --ignore-unknown",
     "format:write": "pnpm format --writer",
-    "db:seed": "node ./seed.ts"
+    "db:seed": "node --loader esbuild-register/loader -r esbuild-register ./seed.ts"
   },
   "dependencies": {
     "dotenv-cli": "^7.3.0",
