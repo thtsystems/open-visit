@@ -44,7 +44,7 @@ export const userSession = pgTable("user_session", {
  * The primary entrypoint to the platform, the user can be an administrative user
  * from the condominium, or one of many company employees.
  *
- * The user will reference either a ccondominium, or an employee, based on the `user_type`.
+ * The user will reference either a condominium, or an employee, based on the `user_type`.
  * This will be used by the client to correctly redirect the user to the correct parts
  * of the application based on the application type.
  */
@@ -123,7 +123,7 @@ export const employee = pgTable("employee", {
   // Referential columns
   userId: uuid("user_id")
     .notNull()
-    .references(() => company.id),
+    .references(() => user.id),
   companyId: uuid("company_id")
     .notNull()
     .references(() => company.id),
