@@ -172,10 +172,8 @@ async function main() {
     console.log("Schedules seed - End")
 
     console.log("Seeding finished")
+
+    await client.end()
 }
 
-const execute = () => new Promise(resolve => {
-    resolve(main())
-})
-
-execute().then(() => 0)
+main()
