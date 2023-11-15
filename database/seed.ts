@@ -109,7 +109,7 @@ function createData(){
                 vehicleType: faker.vehicle.type(),
                 startTime: startTime,
                 endTime: endTime,
-                subject: "Talk about " + faker.science.chemicalElement()
+                subject: "Talk about " + faker.science.chemicalElement().name
             })
         })
     })
