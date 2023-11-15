@@ -69,30 +69,34 @@ function createData(){
         }
     })
 
-    // create a predefine number of employess for each cpmpany for each department of this company
+    // create a predefine number of employees for each company for each department of this company
     companyData.map(company => {
         const departments = departmentData.filter(department => department.companyId === company.id)
 
         departments.map(department => {
-            const employeeUser = {
-                id: faker.string.uuid(),
-                userType: userType.enumValues[0],
-                email: faker.internet.email()
-            }
-            employeeUserData.push(employeeUser)
 
-            employeeData.push({
-                id: faker.string.uuid(),
-                companyId: company.id,
-                departmentId: department.id,
-                name: faker.person.fullName(),
-                email: faker.internet.email(),
-                phoneNumber: faker.phone.number("55###########"),
-                userId: employeeUser.id
-            })
+            for(let i: number = 0; i < generateForEach; i++) {
+                const employeeUser = {
+                    id: faker.string.uuid(),
+                    userType: userType.enumValues[0],
+                    email: faker.internet.email()
+                }
+                employeeUserData.push(employeeUser)
+
+                employeeData.push({
+                    id: faker.string.uuid(),
+                    companyId: company.id,
+                    departmentId: department.id,
+                    name: faker.person.fullName(),
+                    email: faker.internet.email(),
+                    phoneNumber: faker.phone.number("55###########"),
+                    userId: employeeUser.id
+                })
+            }
         })
     })
 
+    // create a scheduling data for each company in a condominium
     condominiumData.map(condominium => {
         const companies = companyData.filter(company => company.condominiumId === condominium.id)
 
@@ -100,17 +104,19 @@ function createData(){
             const startTime = faker.date.anytime()
             const endTime = new Date(startTime.getSeconds() + 7200)
 
-            schedulingData.push({
-                id: faker.string.uuid(),
-                companyId: company.id,
-                condominiumId: condominium.id,
-                visitorName: faker.person.fullName(),
-                vehicleLicencePlate: faker.vehicle.vrm(),
-                vehicleType: faker.vehicle.type(),
-                startTime: startTime,
-                endTime: endTime,
-                subject: "Talk about " + faker.science.chemicalElement().name
-            })
+            for(let i: number = 0; i < generateForEach; i++){
+                schedulingData.push({
+                    id: faker.string.uuid(),
+                    companyId: company.id,
+                    condominiumId: condominium.id,
+                    visitorName: faker.person.fullName(),
+                    vehicleLicencePlate: faker.vehicle.vrm(),
+                    vehicleType: faker.vehicle.type(),
+                    startTime: startTime,
+                    endTime: endTime,
+                    subject: "Talk about " + faker.science.chemicalElement().name
+                })
+            }
         })
     })
 
