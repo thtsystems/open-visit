@@ -5,7 +5,6 @@ import {z, ZodError} from "zod";
 import {department as departmentsTable} from "@open-visit/database/schema"
 import {createInsertSchema} from "drizzle-zod";
 
-import {auth as authFunction, hono as honoMiddleware} from "../auth";
 import {Client} from "pg";
 import {database, eq} from "@open-visit/database";
 
@@ -23,13 +22,6 @@ const departmentsSchema = createInsertSchema(departmentsTable, {
 
 /* Initialize the router tree for the `/departments` route */
 export const departments = new Hono<{ Bindings: Bindings }>();
-
-/** Build the auth client that returns the `auth` constructor from Lucia
- * We pass the database connection string and the middleware as parameters. */
-async function buildAuthClient(env: Bindings) {
-    const connectionString = env.DATABASE_URL;
-    return authFunction(connectionString, honoMiddleware());
-}
 
 /* POST - /
 * Create a new department
