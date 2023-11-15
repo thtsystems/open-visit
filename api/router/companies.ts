@@ -259,7 +259,7 @@ companies.put("/:company_id",
 
             await client.end()
 
-            if(typeof updatedId === "undefined")
+            if(Object.keys(updatedId).length > 0 || typeof updatedId === "undefined")
                 return context.text("Not updated: company not found", 404)
 
             return context.json( updatedId[0], 200)
