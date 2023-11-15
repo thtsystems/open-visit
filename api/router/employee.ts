@@ -12,18 +12,18 @@ import {auth as authFunction, hono as honoMiddleware} from "../auth";
 const validate = require("uuid-validate")
 
 type Bindings = {
-  DATABASE_URL: string;
+    DATABASE_URL: string;
 };
 
 const employeeSchema = createInsertSchema(employeeTable, {
-  phoneNumber: z.string().length(13),
+    phoneNumber: z.string().length(13),
 });
 
 const userSchema = createInsertSchema(userTable, {
-  email: z.string().email(),
+    email: z.string().email(),
 })
-  .extend({ password: z.string() })
-  .omit({ id: true, userType: true });
+    .extend({password: z.string()})
+    .omit({id: true, userType: true});
 
 /* Initialize the router tree for the `/condominium` route */
 export const employee = new Hono<{ Bindings: Bindings }>();
@@ -31,77 +31,85 @@ export const employee = new Hono<{ Bindings: Bindings }>();
 /** Build the auth client that returns the `auth` constructor from Lucia
  * We pass the database connection string and the middleware as parameters. */
 async function buildAuthClient(env: Bindings) {
-  const connectionString = env.DATABASE_URL;
-  return authFunction(connectionString, honoMiddleware());
+    const connectionString = env.DATABASE_URL;
+    return authFunction(connectionString, honoMiddleware());
 }
 
+/* POST - /
+ * Create a new employee
+ */
 employee.post(
-  "/",
-  validator("json", (value, context) => {
-    try {
-      const employeePayload = userSchema
-        .extend({ employeeData: employeeSchema.omit({ userId: true }) })
-        .parse(value);
-      return employeePayload;
-    } catch (error) {
-      if (error instanceof ZodError) {
-        return context.json(
-          {
-            errorMessage: "Bad payload",
-            error: error.issues,
-          },
-          400,
-        );
-      }
-      return context.text("Internal server error", 500);
-    }
-  }),
-  async (context) => {
-    const auth = await buildAuthClient(context.env);
-    try {
-      const { email, password, employeeData } = context.req.valid("json");
-      const client = new Client({ connectionString: context.env.DATABASE_URL });
+    "/",
+    validator("json", (value, context) => {
+        try {
+            const employeePayload = userSchema
+                .extend({employeeData: employeeSchema.omit({userId: true})})
+                .parse(value);
+            return employeePayload;
+        } catch (error) {
+            if (error instanceof ZodError) {
+                return context.json(
+                    {
+                        errorMessage: "Bad payload",
+                        error: error.issues,
+                    },
+                    400,
+                );
+            }
+            return context.text("Internal server error", 500);
+        }
+    }),
+    async (context) => {
+        const auth = await buildAuthClient(context.env);
+        try {
+            const {email, password, employeeData} = context.req.valid("json");
+            const client = new Client({connectionString: context.env.DATABASE_URL});
 
-      const user = await auth.createUser({
-        userId: crypto.randomUUID(),
-        key: {
-          providerId: "email",
-          providerUserId: email.toLowerCase(),
-          password,
-        },
-        attributes: {
-          email,
-          user_type: "EMPLOYEE",
-        },
-      });
+            console.log(email)
 
-      await client.connect();
-      await database(client).insert(employeeTable).values({
-        userId: user.userId,
-        name: employeeData.name,
-        email: employeeData.email,
-        phoneNumber: employeeData.phoneNumber,
-        companyId: employeeData.companyId,
-        departmentId: employeeData.departmentId,
-      });
+            const user = await auth.createUser({
+                userId: crypto.randomUUID(),
+                key: {
+                    providerId: "email",
+                    providerUserId: email.toLowerCase(),
+                    password,
+                },
+                attributes: {
+                    email,
+                    user_type: "EMPLOYEE",
+                },
+            });
 
-      return context.json({ message: "Created employee successfully" }, 200);
-    } catch (error) {
-      if (error instanceof DatabaseError) {
-        if (error.code === "23505")
-          return context.json({ errorMessage: "Employee already exists" }, 400);
-      } else {
-        return context.text("Internal server error", 500);
-      }
-    }
-  },
+            await client.connect();
+            await database(client).insert(employeeTable).values({
+                userId: user.userId,
+                name: employeeData.name,
+                email: employeeData.email,
+                phoneNumber: employeeData.phoneNumber,
+                companyId: employeeData.companyId,
+                departmentId: employeeData.departmentId,
+            });
+
+            return context.json({message: "Created employee successfully"}, 200);
+        } catch (error) {
+            if (error instanceof DatabaseError) {
+                if (error.code === "23505")
+                    return context.json({errorMessage: "Employee already exists"}, 400);
+            } else {
+                return context.text("Internal server error", 500);
+            }
+        }
+    },
 );
 
+/* GET - /:employee_id
+ * Retrieve a employee by id
+ */
 employee.get("/:employee_id",
     validator('param', (value, context) => {
-        const { employee_id } = value
+        const {employee_id} = value
 
-        if(!validate(employee_id))
+        if (!validate(employee_id))
             return context.text("you need to use a UUID as param", 400)
 
         return {
@@ -110,7 +118,7 @@ employee.get("/:employee_id",
     }),
     async context => {
         try {
-            const { employee_id } = context.req.valid("param")
+            const {employee_id} = context.req.valid("param")
 
             const client = new Client({connectionString: context.env.DATABASE_URL})
             await client.connect()
@@ -121,7 +129,7 @@ employee.get("/:employee_id",
             await client.end()
 
             if (typeof employee === "undefined")
-                return context.json({ message: "Employee not found" }, 404);
+                return context.json({message: "Employee not found"}, 404);
 
             return context.json(employee, 200)
         } catch (error) {
@@ -131,11 +139,14 @@ employee.get("/:employee_id",
     }
 )
 
+/* PUT - /:employee_id
+ * Update a employee
+ */
 employee.put("/:employee_id",
     validator("param", (value, context) => {
-        const { employee_id } = value
+        const {employee_id} = value
 
-        if(!validate(employee_id))
+        if (!validate(employee_id))
             return context.text("you need to use a UUID as param", 400)
 
         return {
@@ -143,7 +154,7 @@ employee.put("/:employee_id",
         }
     }),
     validator("json", (value, context) => {
-        try{
+        try {
             return employeeSchema
                 .omit({
                     userId: true,
@@ -152,7 +163,7 @@ employee.put("/:employee_id",
                     id: true
                 })
                 .parse(value);
-        }catch (error){
+        } catch (error) {
             if (error instanceof ZodError) {
                 return context.json(
                     {
@@ -166,9 +177,9 @@ employee.put("/:employee_id",
         }
     }),
     async context => {
-        try{
-            const { employee_id } = context.req.valid("param")
-            const { email, name, phoneNumber } = context.req.valid("json")
+        try {
+            const {employee_id} = context.req.valid("param")
+            const {email, name, phoneNumber} = context.req.valid("json")
 
             const client = new Client({connectionString: context.env.DATABASE_URL})
             await client.connect()
@@ -189,13 +200,13 @@ employee.put("/:employee_id",
                     phoneNumber: employeeTable.phoneNumber
                 })
 
-            if(Object.keys(employee).length === 0)
-                return context.json({ message: "Employee not found" }, 404);
+            if (Object.keys(employee).length === 0)
+                return context.json({message: "Employee not found"}, 404);
 
             await client.end()
 
             return context.json(employee, 200)
-        }catch (error) {
+        } catch (error) {
             console.error(error);
             return context.text("Internal server error", 500);
         }
