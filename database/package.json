@@ -10,7 +10,8 @@
     "db:push": "pnpm dotenv drizzle-kit push:pg",
     "dev": "pnpm dotenv drizzle-kit studio",
     "format": "pnpm prettier . --check --ignore-unknown",
-    "format:write": "pnpm format --writer"
+    "format:write": "pnpm format --writer",
+    "db:seed": "pnpm dotenv tsx ./seed.ts"
   },
   "dependencies": {
     "dotenv-cli": "^7.3.0",
@@ -18,7 +19,9 @@
     "pg": "^8.11.3"
   },
   "devDependencies": {
+    "@faker-js/faker": "^8.2.0",
     "@types/pg": "^8.10.7",
-    "drizzle-kit": "^0.19.13"
+    "drizzle-kit": "^0.19.13",
+    "tsx": "^4.1.3"
   }
 }
