@@ -1,10 +1,7 @@
-import {Client} from "pg"
 import {database} from "./index";
 import {company, condominium, employee, department, scheduling, user, userType} from "./schema"
 import {fakerPT_BR as faker} from "@faker-js/faker";
-
-import * as dotenv from "dotenv";
-dotenv.config({ path: "./.env" });
+import pg from "pg";
 
 if (!("DATABASE_URL" in process.env))
     throw new Error("DATABASE_URL not found in .env")
@@ -12,13 +9,13 @@ if (!("DATABASE_URL" in process.env))
 function createData(){
     const generateForEach: number = 5;
 
-    const employeeUserData: (typeof user.$inferInsert)[] = []
-    const condominiumUserData: (typeof user.$inferInsert)[] = []
-    const condominiumData: (typeof condominium.$inferInsert)[] = []
-    const companyData: (typeof company.$inferInsert)[] = []
-    const departmentData: (typeof department.$inferInsert)[] = []
-    const employeeData: (typeof employee.$inferInsert)[] = []
-    const schedulingData: (typeof scheduling.$inferInsert)[] = []
+    const employeeUserData: (typeof user.$inferSelect)[] = []
+    const condominiumUserData: (typeof user.$inferSelect)[] = []
+    const condominiumData: (typeof condominium.$inferSelect)[] = []
+    const companyData: (typeof company.$inferSelect)[] = []
+    const departmentData: (typeof department.$inferSelect)[] = []
+    const employeeData: (typeof employee.$inferSelect)[] = []
+    const schedulingData: (typeof scheduling.$inferSelect)[] = []
 
     // Create number of user entries for each condominium
     for (let i: number = 0; i < generateForEach; i++){
@@ -89,7 +86,7 @@ function createData(){
                     departmentId: department.id,
                     name: faker.person.fullName(),
                     email: faker.internet.email(),
-                    phoneNumber: faker.phone.number("55###########"),
+                    phoneNumber: `559${faker.string.numeric(8)}`,
                     userId: employeeUser.id
                 })
             }
@@ -132,7 +129,7 @@ function createData(){
 }
 
 async function main() {
-    const client = new Client({connectionString: process.env.DATABASE_URL as string})
+    const client = new pg.Client({connectionString: process.env.DATABASE_URL as string})
     await client.connect()
 
     const db = database(client)
