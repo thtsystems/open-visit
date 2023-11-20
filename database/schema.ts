@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { pgTable, varchar, bigint, uuid, timestamp, pgEnum, boolean } from "drizzle-orm/pg-core";
+import {pgTable, varchar, bigint, uuid, timestamp, pgEnum, boolean, primaryKey} from "drizzle-orm/pg-core";
 
 /**
  * Used to handle authentication.
@@ -125,6 +125,27 @@ export const condominiumRelationships = relations(condominium, ({ many }) => ({
   companies: many(company),
   schedulings: many(scheduling),
 }));
+
+/**
+ * Relational table for multiple users in multiple condominiums
+ */
+export const usersToCondominiums = pgTable('users_to_condominiums', {
+  userId: uuid('user_id').notNull().references(() => user.id),
+  condominiumId: uuid('condominium_id').notNull().references(() => condominium.id),
+}, (t) => ({
+  pk: primaryKey(t.userId, t.condominiumId)
+}))
+
+export const usersToCondominiumsRelations = relations(usersToCondominiums, ({ one }) => ({
+  user: one(user, {
+    fields: [usersToCondominiums.userId],
+    references: [user.id]
+  }),
+  condominium: one(condominium, {
+    fields: [usersToCondominiums.condominiumId],
+    references: [condominium.id]
+  })
+}))
 
 /**
  * The employee is one of many collaborators that can be contained within
