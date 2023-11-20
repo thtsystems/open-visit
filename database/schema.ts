@@ -19,7 +19,7 @@ export const userKey = pgTable("user_key", {
     .references(() => user.id),
 });
 
-export const userType = pgEnum("user_type", ["EMPLOYEE", "CONDOMINIUM"]);
+export const userType = pgEnum("user_type", ["EMPLOYEE", "EMPLOYEE_ADMIN", "CONDOMINIUM"]);
 
 /** Used to handle authentication.
  *
@@ -160,7 +160,7 @@ export const employee = pgTable("employee", {
   // Referential columns
   userId: uuid("user_id")
     .notNull()
-    .references(() => company.id),
+    .references(() => user.id),
   companyId: uuid("company_id")
     .notNull()
     .references(() => company.id),
