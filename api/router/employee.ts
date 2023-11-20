@@ -64,9 +64,6 @@ employee.post(
         try {
             const {email, password, employeeData} = context.req.valid("json");
             const client = new Client({connectionString: context.env.DATABASE_URL});
-
-            console.log(email)
-
             const user = await auth.createUser({
                 userId: crypto.randomUUID(),
                 key: {
