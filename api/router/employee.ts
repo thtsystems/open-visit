@@ -214,6 +214,9 @@ employee.put("/:employee_id",
     }
 )
 
+/* DELETE - /:employee_id
+ * remove a employee
+ */
 employee.delete("/:employee_id",
     validator("param", (value, context) => {
         const {employee_id} = value
