@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { pgTable, varchar, bigint, uuid, timestamp, pgEnum, boolean } from "drizzle-orm/pg-core";
+import {pgTable, varchar, bigint, uuid, timestamp, pgEnum, boolean, primaryKey} from "drizzle-orm/pg-core";
 
 /**
  * Used to handle authentication.
@@ -19,7 +19,7 @@ export const userKey = pgTable("user_key", {
     .references(() => user.id),
 });
 
-export const userType = pgEnum("user_type", ["EMPLOYEE", "CONDOMINIUM"]);
+export const userType = pgEnum("user_type", ["EMPLOYEE", "EMPLOYEE_ADMIN", "CONDOMINIUM"]);
 
 /** Used to handle authentication.
  *
@@ -52,6 +52,11 @@ export const user = pgTable("user", {
   id: uuid("id").primaryKey().defaultRandom().notNull().unique(),
   email: varchar("email").notNull(),
   userType: userType("user_type").notNull(),
+
+  // Dates
+  createdAt: timestamp("created_at", { withTimezone: false, mode: "string" }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: false, mode: "string" }).defaultNow().notNull(),
+  deletedAt: timestamp("deleted_at", { withTimezone: false, mode: "string" })
 });
 export const usersRelations = relations(user, ({ one }) => ({
   condominium: one(condominium, {
@@ -77,6 +82,11 @@ export const company = pgTable("company", {
   active: boolean("active").notNull().default(true),
 
   condominiumId: uuid("condominium_id").references(() => condominium.id),
+
+  // Dates
+  createdAt: timestamp("created_at", { withTimezone: false, mode: "string" }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: false, mode: "string" }).defaultNow().notNull(),
+  deletedAt: timestamp("deleted_at", { withTimezone: false, mode: "string" })
 });
 export const companyRelationships = relations(company, ({ one, many }) => ({
   condominium: one(condominium, {
@@ -104,11 +114,38 @@ export const condominium = pgTable("condominium", {
   userId: uuid("user_id")
     .notNull()
     .references(() => user.id),
+
+  // Dates
+  createdAt: timestamp("created_at", { withTimezone: false, mode: "string" }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: false, mode: "string" }).defaultNow().notNull(),
+  deletedAt: timestamp("deleted_at", { withTimezone: false, mode: "string" })
 });
-export const condominiumRelationships = relations(condominium, ({ many, one }) => ({
+export const condominiumRelationships = relations(condominium, ({ many }) => ({
+  users: many(user),
   companies: many(company),
   schedulings: many(scheduling),
 }));
+
+/**
+ * Relational table for multiple users in multiple condominiums
+ */
+export const usersToCondominiums = pgTable('users_to_condominiums', {
+  userId: uuid('user_id').notNull().references(() => user.id),
+  condominiumId: uuid('condominium_id').notNull().references(() => condominium.id),
+}, (t) => ({
+  pk: primaryKey(t.userId, t.condominiumId)
+}))
+
+export const usersToCondominiumsRelations = relations(usersToCondominiums, ({ one }) => ({
+  user: one(user, {
+    fields: [usersToCondominiums.userId],
+    references: [user.id]
+  }),
+  condominium: one(condominium, {
+    fields: [usersToCondominiums.condominiumId],
+    references: [condominium.id]
+  })
+}))
 
 /**
  * The employee is one of many collaborators that can be contained within
@@ -123,13 +160,18 @@ export const employee = pgTable("employee", {
   // Referential columns
   userId: uuid("user_id")
     .notNull()
-    .references(() => company.id),
+    .references(() => user.id),
   companyId: uuid("company_id")
     .notNull()
     .references(() => company.id),
   departmentId: uuid("department_id")
     .notNull()
     .references(() => department.id),
+
+  // Dates
+  createdAt: timestamp("created_at", { withTimezone: false, mode: "string" }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: false, mode: "string" }).defaultNow().notNull(),
+  deletedAt: timestamp("deleted_at", { withTimezone: false, mode: "string" })
 });
 export const employeeRelationships = relations(employee, ({ one }) => ({
   company: one(company, {
@@ -155,6 +197,11 @@ export const department = pgTable("department", {
   companyId: uuid("company_id")
     .notNull()
     .references(() => company.id),
+
+  // Dates
+  createdAt: timestamp("created_at", { withTimezone: false, mode: "string" }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: false, mode: "string" }).defaultNow().notNull(),
+  deletedAt: timestamp("deleted_at", { withTimezone: false, mode: "string" })
 });
 export const departmentRelationships = relations(department, ({ one, many }) => ({
   company: one(company, {
@@ -184,6 +231,11 @@ export const scheduling = pgTable("scheduling", {
   companyId: uuid("company_id")
     .notNull()
     .references(() => company.id),
+
+  // Dates
+  createdAt: timestamp("created_at", { withTimezone: false, mode: "string" }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: false, mode: "string" }).defaultNow().notNull(),
+  deletedAt: timestamp("deleted_at", { withTimezone: false, mode: "string" })
 });
 export const schedulingRelationshipts = relations(scheduling, ({ one }) => ({
   condominium: one(condominium, {
