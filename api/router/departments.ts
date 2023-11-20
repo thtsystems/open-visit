@@ -142,7 +142,7 @@ departments.get("/:department_id/employees",
 )
 
 /* PUT - /:department_id
-* Update a department with
+* Update a department with specified id in param
 */
 departments.put("/:department_id",
     validator("param", (value, context) => {
@@ -195,6 +195,47 @@ departments.put("/:department_id",
                 return context.text("Not updated: department not found", 404)
 
             return context.json(updatedId[0], 200)
+        }catch (error) {
+            console.log(error)
+            return context.text("Internal server error", 500)
+        }
+    }
+)
+
+/* PUT - /:department_id
+* Delete a department with the specified id in param
+*/
+departments.delete("/:department_id",
+    validator("param", (value, context) => {
+        const {department_id} = value
+
+        if(!validate(department_id))
+            return context.json({message: "You need to use a UUID as a parameter"}, 400)
+
+        return {
+            department_id
+        }
+    }),
+    async context => {
+        try{
+            const {department_id} = context.req.valid("param")
+
+            const client = new Client({connectionString: context.env.DATABASE_URL})
+            await client.connect()
+
+            const deletedId: {deletedId: string}[] = database(client).update(departmentsTable)
+                .set({
+                    deletedAt: new Date()
+                })
+                .where(eq(departmentsTable.id, department_id))
+                .returning({ deletedId: departmentsTable.id })
+
+            await client.end()
+
+            if(Object.keys(deletedId).length <= 0 || typeof deletedId === "undefined")
+                return context.text("Not updated: department not found", 404)
+
+            return context.json(deletedId[0], 200)
         }catch (error) {
             console.log(error)
             return context.text("Internal server error", 500)
