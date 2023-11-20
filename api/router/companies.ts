@@ -110,7 +110,7 @@ companies.get("/:company_id",
             await client.connect()
 
             const company = await database(client).query.company.findFirst({
-                where: (company, {and, eq}) => and(eq(company.id, company_id), eq(company.active, true))
+                where: (company, {and, eq, isNull}) => and(eq(company.id, company_id), eq(company.active, true), isNull(company.deletedAt))
             })
 
             await client.end()
@@ -254,7 +254,7 @@ companies.put("/:company_id",
                     condominiumAddress: condominiumAddress
                 })
                 .where(eq(companyTable.id, company_id))
-                //.where(and(eq(companyTable.id, company_id), eq(companyTable.active, true))) in case if want to filter only actives to update
+                // .where(and(eq(companyTable.id, company_id), eq(companyTable.active, true), isNull(companyTable.deletedAt))) //in case if want to filter only actives to update
                 .returning({ updatedId: companyTable.id })
 
             await client.end()
@@ -293,8 +293,8 @@ companies.delete("/:company_id",
 
             const removedId: {removedId: string}[] = await database(client).update(companyTable)
                 .set({
-                    active: false
-                    deletedAt: new Date()
+                    active: false,
+                    deletedAt: new Date().toISOString()
                 })
                 .where(eq(companyTable.id, company_id))
                 .returning({removedId: companyTable.id})
