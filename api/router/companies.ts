@@ -259,7 +259,7 @@ companies.put("/:company_id",
 
             await client.end()
 
-            if(Object.keys(updatedId).length > 0 || typeof updatedId === "undefined")
+            if(Object.keys(updatedId).length <= 0 || typeof updatedId === "undefined")
                 return context.text("Not updated: company not found", 404)
 
             return context.json( updatedId[0], 200)
@@ -294,13 +294,14 @@ companies.delete("/:company_id",
             const removedId: {removedId: string}[] = await database(client).update(companyTable)
                 .set({
                     active: false
+                    deletedAt: new Date()
                 })
                 .where(eq(companyTable.id, company_id))
                 .returning({removedId: companyTable.id})
 
             await client.end()
 
-            if(typeof removedId === "undefined")
+            if(Object.keys(removedId).length <= 0 || typeof removedId === "undefined")
                 return context.text("Company not removed: not found", 404)
 
             return context.json(removedId[0], 200)
