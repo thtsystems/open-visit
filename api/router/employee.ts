@@ -121,7 +121,7 @@ employee.get("/:employee_id",
             await client.connect()
 
             const employee = await database(client).query.employee.findFirst({
-                where: (employee, {eq}) => eq(employee.id, employee_id)
+                where: (employee, {eq, and, isNull}) => and(eq(employee.id, employee_id), isNull(employee.deletedAt))
             })
             await client.end()
 
@@ -233,7 +233,7 @@ employee.delete("/:employee_id",
 
             const deletedId: {deletedId: string}[] = await database(client).update(employeeTable)
                 .set({
-                    deletedAt: new Date()
+                    deletedAt: new Date().toISOString()
                 })
                 .where(eq(employeeTable.id, employee_id))
                 .returning({
