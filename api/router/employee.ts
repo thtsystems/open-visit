@@ -8,6 +8,7 @@ import {database, eq} from "@open-visit/database";
 import {employee as employeeTable, user as userTable} from "@open-visit/database/schema";
 
 import {auth as authFunction, hono as honoMiddleware} from "../auth";
+import {type} from "os";
 
 const validate = require("uuid-validate")
 
@@ -200,13 +201,53 @@ employee.put("/:employee_id",
                     phoneNumber: employeeTable.phoneNumber
                 })
 
+            await client.end()
+
             if (Object.keys(employee).length <= 0 || typeof employee === "undefined")
                 return context.json({message: "Employee not found"}, 404);
 
-            await client.end()
-
             return context.json(employee, 200)
         } catch (error) {
+            console.error(error);
+            return context.text("Internal server error", 500);
+        }
+    }
+)
+
+employee.delete("/:employee_id",
+    validator("param", (value, context) => {
+        const {employee_id} = value
+
+        if (!validate(employee_id))
+            return context.text("you need to use a UUID as param", 400)
+
+        return {
+            employee_id
+        }
+    }),
+    async context => {
+        try{
+            const {employee_id} = context.req.valid("param")
+
+            const client = new Client({connectionString: context.env.DATABASE_URL})
+            await client.connect()
+
+            const deletedId: {deletedId: string}[] = await database(client).update(employeeTable)
+                .set({
+                    deletedAt: new Date()
+                })
+                .where(eq(employeeTable.id, employee_id))
+                .returning({
+                    deletedId: employeeTable.id,
+                })
+
+            await client.end()
+
+            if(Object.keys(deletedId).length <= 0 || typeof deletedId === "undefined")
+                return context.json({message: "Employee not found"}, 404);
+
+            return context.json(deletedId[0], 200)
+        }catch(error){
             console.error(error);
             return context.text("Internal server error", 500);
         }
