@@ -90,7 +90,7 @@ departments.get("/:department_id",
             await client.connect()
 
             const department = await database(client).query.department.findFirst({
-                where: (department, {eq}) => eq(department.id, department_id)
+                where: (department, {eq, and, isNull}) => and(eq(department.id, department_id), isNull(department.deletedAt))
             })
 
             await client.end()
@@ -223,9 +223,9 @@ departments.delete("/:department_id",
             const client = new Client({connectionString: context.env.DATABASE_URL})
             await client.connect()
 
-            const deletedId: {deletedId: string}[] = database(client).update(departmentsTable)
+            const deletedId: {deletedId: string}[] = await database(client).update(departmentsTable)
                 .set({
-                    deletedAt: new Date()
+                    deletedAt: new Date().toISOString()
                 })
                 .where(eq(departmentsTable.id, department_id))
                 .returning({ deletedId: departmentsTable.id })
