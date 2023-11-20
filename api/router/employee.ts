@@ -8,7 +8,6 @@ import {database, eq} from "@open-visit/database";
 import {employee as employeeTable, user as userTable} from "@open-visit/database/schema";
 
 import {auth as authFunction, hono as honoMiddleware} from "../auth";
-import {type} from "os";
 
 const validate = require("uuid-validate")
 
