@@ -200,7 +200,7 @@ employee.put("/:employee_id",
                     phoneNumber: employeeTable.phoneNumber
                 })
 
-            if (Object.keys(employee).length === 0)
+            if (Object.keys(employee).length <= 0 || typeof employee === "undefined")
                 return context.json({message: "Employee not found"}, 404);
 
             await client.end()
